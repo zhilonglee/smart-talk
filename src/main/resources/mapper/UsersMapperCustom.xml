@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zhilong.smarttalk.mapper.UsersMapperCustom">
+
+    <select id="queryFriendRequestList" resultType="com.zhilong.smarttalk.pojo.vo.FriendRequestVO" parameterType="String">
+        select
+        sender.id as sendUserId,
+        sender.username as sendUsername,
+        sender.face_image as sendFaceImage,
+        sender.nickname as sendNickname
+        from
+        tbl_friend_request fr
+        left join
+        tbl_user sender
+        on
+        fr.send_user_id = sender.id
+        where
+        fr.accept_user_id = #{acceptUserId}
+    </select>
+
+
+    <select id="queryMyFriends" resultType="com.zhilong.smarttalk.pojo.vo.MyFriendsVO" parameterType="String">
+        select
+        u.id as friendUserId,
+        u.username as friendUsername,
+        u.face_image as friendFaceImage,
+        u.nickname as friendNickname
+        from
+        tbl_friend_list mf
+        left join
+        tbl_user u
+        on
+        u.id = mf.my_friend_user_id
+        where
+        mf.my_user_id = #{userId}
+    </select>
+
+    <!-- 批处理，更新消息为已签收 -->
+    <update id="batchUpdateMsgSigned">
+        update tbl_chat_msg set sign_flag = 1 where id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+</mapper>
